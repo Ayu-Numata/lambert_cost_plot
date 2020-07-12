@@ -2,7 +2,7 @@
 
 import math
 import vehicle_sizing
-Mp = vehicle_sizing.massProp_chemi()
+
 
 g = 9.80665
 
@@ -20,15 +20,22 @@ Mengine_che = (0.00766 * Ttotrk + 0.00033 * Ttotrk * pow(100, 0.5) + 130) * 0.45
 
 #1機あたりのpayloadの値は指定しない
 def cal_cost(mass_Payload, Launch_payload, deltaV, Isp):
+    neuton0 = deltaV * 10000
+    neuton1 = deltaV * 10100
     #通常のサイジング:1機ずつ
-    massPropellant = Mp.massProp(neuton0, neuton1, mass_Payload, Isp, deltaV)
+    massPropellant = vehicle_sizing.massProp(neuton0, neuton1, mass_Payload, Isp, deltaV)
     massTotal = massPropellant / (1 - math.exp((-1) * deltaV * 1000 / (Isp * g)))
     massStr = massTotal - massPropellant - mass_Payload
+    over = False
 
-    vehicle_cost = math.pow((massStr * single_vehicle_cost / massStr_base), 0.46)
-    operationCost =(massPropellant / massProp_base) * operation_cost
-    Launchcost = (massTotal / Launch_payload) * launch_cost
+    if (massPropellant == 100000):
+        over = True
+        Totalcost = 0
+    else:
+        vehicle_cost = math.pow((massStr * single_vehicle_costbase / massStr_base), 0.46)
+        operationCost =(massPropellant / massProp_base) * operation_cost_base
+        Launchcost = (massTotal / Launch_payload) * launch_cost_base
 
-    Totalcost = vehicle_cost + operationCost + Launchcost
-
+        Totalcost = vehicle_cost + operationCost + Launchcost
+    print(Totalcost)
     return Totalcost

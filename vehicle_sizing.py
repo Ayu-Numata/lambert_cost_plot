@@ -77,27 +77,28 @@ def g_chemical2(x_0, x_1, massPay, Isp):
     return g
 
 
-class massProp_chemi:
-    def massProp(self, x0, x1, massPay, Isp, deltaV):
-        dx = x0 - x1
+
+def massProp(x0, x1, massPay, Isp, deltaV):
+    dx = x0 - x1
+    if (dx < 0):
+        dx = dx * (-1)
+    x_new = 1
+
+    while(dx > 0.00001):
+        #print(str(g_chemical(x0, x1, massPay, Isp, deltaV)))
+        x_new = x1 - f_chemical(x1, massPay, Isp, deltaV) / g_chemical(x0, x1, massPay, Isp, deltaV)
+
+        dx = x_new - x1
         if (dx < 0):
             dx = dx * (-1)
 
-        while(dx > 0.00001):
-            #print(str(g_chemical(x0, x1, massPay, Isp, deltaV)))
-            x_new = x1 - f_chemical(x1, massPay, Isp, deltaV) / g_chemical(x0, x1, massPay, Isp, deltaV)
+        x0 = x1
+        x1 = x_new
+        #print('massProp = '+ str(x_new))
 
-            dx = x_new - x1
-            if (dx < 0):
-                dx = dx * (-1)
+        if (x_new < 0):
+            x_new = 100000
+            return x_new
+            break
 
-            x0 = x1
-            x1 = x_new
-            #print('massProp = '+ str(x_new))
-
-            if (x_new < 0):
-                x_new = 100000
-                return x_new
-                break
-
-        return x_new
+    return x_new

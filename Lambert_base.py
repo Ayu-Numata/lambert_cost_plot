@@ -23,32 +23,33 @@ def vector_minus(a, b):
 
 def function_c(z):
     if (z > 0):
-        c = (1.0 - np.cos(np.sqrt(z))) / z
+        c = (1.0 - math.cos(math.sqrt(z))) / z
     elif (z < 0):
-        c = (np.cosh(np.sqrt(z * (-1))) - 1.0) / (z * (-1))
+        c = (math.cosh(math.sqrt(z * (-1))) - 1.0) / (z * (-1))
     else:
         c = 1.0 / 2.0
     return c
 
 def function_s(z):
+    #print(z)
     if (z > 0):
-        s = (np.sqrt(z) - np.sin(np.sqrt(z))) / np.pow(np.sqrt(z), 3.0)
+        s = (math.sqrt(z) - math.sin(math.sqrt(z))) / math.pow(math.sqrt(z), 3.0)
         #print(str(s))
     elif (z < 0):
         za = z * (-1)
-        s = (np.sinh(np.sqrt(za)) - np.sqrt(za)) / np.pow(np.sqrt(za), 3.0)
+        s = (math.sinh(math.sqrt(za)) - math.sqrt(za)) / math.pow(math.sqrt(za), 3.0)
         #print(str(s))
     else:
         s = 1.0 / 6.0
     return s
 
 def function_y(z, A, r1, r2):
-    y = r1 + r2 + A * (z * function_s(z) - 1.0) / np.sqrt(function_c(z))
+    y = r1 + r2 + A * (z * function_s(z) - 1.0) / math.sqrt(function_c(z))
     return y
 
 
 def function_f(z, dt, A, r1, r2):
-    fz = ((function_y(z, A, r1, r2) / function_c(z))**(3.0/2.0)) * function_s(z) + A * np.sqrt(function_y(z, A, r1, r2)) - dt * np.sqrt(GMs)
+    fz = math.pow((function_y(z, A, r1, r2) / function_c(z)), (3.0/2.0)) * function_s(z) + A * math.sqrt(function_y(z, A, r1, r2)) - dt * math.sqrt(GMs)
     return fz
 
 def function_f_dif(z, A, r1, r2):
@@ -56,30 +57,33 @@ def function_f_dif(z, A, r1, r2):
     sc = function_s(z) / function_c(z)
     if (z == 0):
         y0 = function_y(0, A, r1, r2)
-        fz_dif = math.sqrt(2.0) * (y0**(3.0/2.0)) / 40.0 + A * (np.sqrt(y0) + A * np.sqrt(1 / (2 * y0))) / 8.0
+        fz_dif = math.sqrt(2.0) * math.pow(y0, (3.0/2.0)) / 40.0 + A * (math.sqrt(y0) + A * math.sqrt(1 / (2 * y0))) / 8.0
     else:
-        fz_dif = np.pow(yc, 3.0/2.0) * ((function_c(z) - 3.0 * sc / 2.0) / (2.0 * z) + 3.0 * sc * function_s(z) / 4.0) + A * (3 * sc * np.sqrt(function_y(z, A, r1, r2)) + A / np.sqrt(yc)) / 8
+        fz_dif = math.pow(yc, 3.0/2.0) * ((function_c(z) - 3.0 * sc / 2.0) / (2.0 * z) + 3.0 * sc * function_s(z) / 4.0) + A * (3 * sc * math.sqrt(function_y(z, A, r1, r2)) + A / math.sqrt(yc)) / 8
 
     return fz_dif
 
 '''Lambert問題計算する関数'''
 def lambert(days, r1, r2, degree_f):
     sita =  degree_f + 360.0 * days / 687
-    rad = np.radians(sita)         #始点と終点のなす角
+    rad = math.radians(sita)         #始点と終点のなす角
     r1_x = r1
     r1_y = 0
-    r2_x = r2 * np.cos(rad)
-    r2_y = r2 * np.sin(rad)
+    r2_x = r2 * math.cos(rad)
+    r2_y = r2 * math.sin(rad)
 
     #velocity of the planetary orbit
     V_firstplanet = math.sqrt(GMs / r1)
     V_secondplanet = math.sqrt(GMs / r2)
 
     V_vector_firstplanet = [0, V_firstplanet]
-    V_vector_secondplanet = [V_secondplanet * np.cos(rad + math.pi / 2), V_secondplanet * np.sin(rad + math.pi / 2)]
+    V_vector_secondplanet = [V_secondplanet * math.cos(rad + math.pi / 2), V_secondplanet * math.sin(rad + math.pi / 2)]
 
-    A = np.sin(rad) * np.sqrt(r1 * r2 / (1.0 - np.cos(rad)))
-
+    try:
+        A = math.sin(rad) * math.sqrt(r1 * r2 / (1.0 - math.cos(rad)))
+    except ZeroDivisionError:
+        print(rad)
+        A = 1
     dt = days * 24 * 60 * 60.0        #[s], trans time
 
     dz = 1.0
@@ -99,8 +103,12 @@ def lambert(days, r1, r2, degree_f):
                 e = False
                 break
 
-            dz = abs(z_new - z)
+            if (np.abs(z_new) == np.inf):
+                z_new = 88888
+                break
 
+            dz = abs(z_new - z)
+            #print(dz)
             z = z_new
             nz += 1
             if (nz > 30):
