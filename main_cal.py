@@ -32,12 +32,22 @@ for i, xi in enumerate(x_set):
         zi = keisan(xi, yi)
         z_set[i][j] = zi
 
-X, Y = np.meshgrid(x_set, y_set)
-Z = z_set
-
 #出力する　pandas
-df = pd.DataFrame([x_set, y_set, z_set])
-df.to_csv("result.csv", header = False, index = False)
+df = pd.DataFrame(z_set)
+df.columns = x_set
+df.index = y_set
+
+
+df.to_csv("result.csv")
+
+
+'''
+df = pd.DataFrame([x_set, y_set])
+dg = pd.DataFrame([z_set])
+df.T.to_csv("result.csv", header = False, index = False)
+dg.to_csv("result_z.csv", header = False, index = False)
+#df.T.to_txt("result.txt", header = False, index = False)
+'''
 
 '''
 #等高線図の生成
