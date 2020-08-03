@@ -30,7 +30,7 @@ def cal_cost(mass_Payload, Launch_payload, deltaV, Isp):
 
     if (massPropellant == 100000):
         over = True
-        Totalcost = -1
+        Totalcost = -100
     else:
         vehicle_cost = math.pow((massStr * single_vehicle_costbase / massStr_base), 0.46)
         operationCost =(massPropellant / massProp_base) * operation_cost_base

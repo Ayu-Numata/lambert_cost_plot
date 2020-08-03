@@ -52,5 +52,7 @@ plt.ylabel('Y', fontsize=24)
 plt.pcolormesh(X,Y,Z, cmap='Spectral') #カラー等高線図
 pp = plt.colorbar (orientation="vertical") # カラーバーの表示
 pp.set_label("Label",  fontsize=24)
+pp.mappable.set_clim(0, 40)
+pp.cmap.set_under('w')
 
 plt.show()
